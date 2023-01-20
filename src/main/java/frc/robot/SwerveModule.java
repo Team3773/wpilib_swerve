@@ -16,6 +16,7 @@ import com.ctre.phoenix.sensors.CANCoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.revrobotics.SparkMaxRelativeEncoder.Type;
 
 public class SwerveModule {
   private static final double kWheelRadius = 0.0508;
@@ -69,23 +70,26 @@ public class SwerveModule {
 
     m_turnCANcoder = new CANCoder(canCoderCanChannel);
       
-    m_driveEncoder = m_driveMotor.getEncoder();
-    m_turningEncoder = m_turningMotor.getEncoder();
+    m_driveEncoder = m_driveMotor.getEncoder(Type.kQuadrature, kEncoderResolution);
+    m_turningEncoder = m_turningMotor.getEncoder(Type.kQuadrature, kEncoderResolution);
 
     // Set the distance per pulse for the drive encoder. We can simply use the
     // distance traveled for one rotation of the wheel divided by the encoder
     // resolution.
     // m_driveEncoder.setDistancePerPulse(2 * Math.PI * kWheelRadius / kEncoderResolution);
-    m_driveEncoder.setPositionConversionFactor(2 * Math.PI * kWheelRadius / kEncoderResolution);
+    m_driveEncoder.setPositionConversionFactor(2 * Math.PI * kWheelRadius);
 
     // Set the distance (in this case, angle) in radians per pulse for the turning encoder.
     // This is the the angle through an entire rotation (2 * pi) divided by the
     // encoder resolution.
-    //  m_driveEncoder.setDistancePerPulse(2 * Math.PI * kWheelRadius / kEncoderResolution);
-    m_turningEncoder.setPositionConversionFactor(2 * Math.PI / kEncoderResolution);
+    //  m_turningEncoder.setDistancePerPulse(2 * Math.PI / kEncoderResolution);
+    m_turningEncoder.setPositionConversionFactor(2 * Math.PI);
 
     // Limit the PID Controller's input range between -pi and pi and set the input
     // to be continuous.
+    m_driveEncoder.setVelocityConversionFactor(2 * Math.PI * kWheelRadius * 60);
+    m_turningEncoder.setVelocityConversionFactor(2 * Math.PI * 60);
+
     m_turningPIDController.enableContinuousInput(-Math.PI, Math.PI);
   }
   // public double getDistance()
